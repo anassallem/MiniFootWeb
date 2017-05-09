@@ -97,6 +97,12 @@
     "react-dom": "^15.3.0",
     "react-hot-loader": "^3.0.0-beta.2",
     "react-router": "^3.0.0-alpha.3",
-    "source-map-support": "^0.4.0"
+    "source-map-support": "^0.4.0",
+    "axios": "^0.15.3",
+    "moment": "^2.18.1",
+    "nodemon": "^1.11.0",
+    "react-redux": "^5.0.3",
+    "redux": "^3.6.0",
+    "redux-thunk": "^2.2.0"
   }
 }

@@ -13,7 +13,7 @@ import Footer from './common/footer';
 /* Pages */
 import Gallery from './routes/Gallery';
 
-import Social from './routes/Social';
+import Profile from './routes/Profile';
 import Maps from './routes/Maps';
 
 import Datatablesjs from './routes/Datatablesjs';
@@ -54,7 +54,7 @@ export default (
         </Route>
         <Route component={App} path='/ltr'>
             <Route path='gallery' component={Gallery} />
-            <Route path='social' component={Social} />
+            <Route path='profile' component={Profile} />
             <Route path='maps' component={Maps} />
             <Route path='tables/datatables' component={Datatablesjs} />
             <Route path='calendar' component={Calendar} />

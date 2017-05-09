@@ -1,7 +1,6 @@
 import React from 'react';
 import classNames from 'classnames';
 import { Link, withRouter } from 'react-router';
-
 import {
   Row,
   Col,
@@ -20,9 +19,37 @@ import {
   ButtonToolbar,
   PanelContainer,
 } from '@sketchpixy/rubix';
-
+import { auth } from '../api/UserApi';
+const INITIALSTATE = {
+  email: '',
+  password: '',
+  testEmail: null,
+  testPassword: null,
+  error: ''
+ }
 @withRouter
 export default class Login extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = INITIALSTATE;
+  }
+   validateEmail(email){
+    if (email !== '') {
+      const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      return re.test(email);
+    }
+      return null;
+  }
+
+   validatePassword(password) {
+    if (password !== '') {
+      const re =(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/);
+      return re.test(password);
+    }
+    return null;
+  }
+
   back(e) {
     e.preventDefault();
     e.stopPropagation();
@@ -43,6 +70,41 @@ export default class Login extends React.Component {
     return path;
   }
 
+  onChangeEmail(event) {
+    this.setState({ email: event.target.value, testEmail: this.validateEmail(event.target.value) });
+
+  }
+  onChangePassword(event) {
+    this.setState({ password: event.target.value, testPassword: this.validatePassword(event.target.value) });
+  }
+  handleClick(event) {
+    event.preventDefault();
+    const { testEmail, testPassword, email, password, error } = this.state;
+    if(testEmail === true && testPassword === true){
+      const user = { email: this.state.email, password: this.state.password };
+      auth(user).then((res) => {
+        if (res.success === true) {
+          if(res.user.role !== 'Manager') {
+             this.setState({ error: "User Not Found"});
+          } else {
+            localStorage.setItem('user', JSON.stringify(res.user));
+            this.setState(INITIALSTATE);
+            setTimeout(() => {
+              this.props.router.push('/ltr/calendar');
+            }, 1000);
+          }
+        } else if (res.success === false) {
+            this.setState({ error: res.message });
+        }
+        }, (err) => {
+          console.log(err);
+        }
+      );
+    } else {
+      this.setState({ error: "Vérifier vos champs "});
+    }
+  }
+
   render() {
     return (
       <div id='auth-container' className='login'>
@@ -55,24 +117,9 @@ export default class Login extends React.Component {
                     <Panel>
                       <PanelBody style={{padding: 0}}>
                         <div className='text-center bg-darkblue fg-white'>
-                          <h3 style={{margin: 0, padding: 25}}>Sign in to Rubix</h3>
-                        </div>
-                        <div className='bg-hoverblue fg-black50 text-center' style={{padding: 12.5}}>
-                          <div>You need to sign in for those awesome features</div>
-                          <div style={{marginTop: 12.5, marginBottom: 12.5}}>
-                            <Button id='facebook-btn' lg bsStyle='darkblue' type='submit' onClick={::this.back}>
-                              <Icon glyph='icon-fontello-facebook' />
-                              <span>Sign in <span className='hidden-xs'>with facebook</span></span>
-                            </Button>
-                          </div>
-                          <div>
-                            <a id='twitter-link' href='#' onClick={::this.back}><Icon glyph='icon-fontello-twitter' /><span> or with twitter</span></a>
-                          </div>
+                          <h3 style={{margin: 0, padding: 25}}>Connecter à MiniFoot</h3>
                         </div>
                         <div>
-                          <div className='text-center' style={{padding: 12.5}}>
-                            or use your Rubix account
-                          </div>
                           <div style={{padding: 25, paddingTop: 0, paddingBottom: 0, margin: 'auto', marginBottom: 25, marginTop: 25}}>
                             <Form onSubmit={::this.back}>
                               <FormGroup controlId='emailaddress'>
@@ -80,25 +127,38 @@ export default class Login extends React.Component {
                                   <InputGroup.Addon>
                                     <Icon glyph='icon-fontello-mail' />
                                   </InputGroup.Addon>
-                                  <FormControl autoFocus type='email' className='border-focus-blue' placeholder='support@sketchpixy.com' />
+                                  <FormControl autoFocus type='email' className='border-focus-blue' placeholder='exemple@exemple.com'
+                                      value={this.state.email} onChange={this.onChangeEmail.bind(this)}
+                                  />
                                 </InputGroup>
+                              </FormGroup>
+                              <FormGroup>
+                                <label>{ (this.state.testEmail === false)? 'E-mail non valide' : '' }</label>
                               </FormGroup>
                               <FormGroup controlId='password'>
                                 <InputGroup bsSize='large'>
                                   <InputGroup.Addon>
                                     <Icon glyph='icon-fontello-key' />
                                   </InputGroup.Addon>
-                                  <FormControl type='password' className='border-focus-blue' placeholder='password' />
+                                  <FormControl type='password' className='border-focus-blue' placeholder='Mot de passe'
+                                      value={this.state.password} onChange={this.onChangePassword.bind(this)}
+                                  />
                                 </InputGroup>
+                              </FormGroup>
+                              <FormGroup>
+                                <label>{ (this.state.testPassword === false)? 'Password non valide' : '' }</label>
                               </FormGroup>
                               <FormGroup>
                                 <Grid>
                                   <Row>
+                                    <Col xs={12} collapseLeft collapseRight style={{paddingTop: 10}}>
+                                      <label>{ this.state.error }</label>
+                                    </Col>
                                     <Col xs={6} collapseLeft collapseRight style={{paddingTop: 10}}>
-                                      <Link to={::this.getPath('signup')}>Create a Rubix account</Link>
+                                      <Link to={::this.getPath('signup')}>Créer un compte</Link>
                                     </Col>
                                     <Col xs={6} collapseLeft collapseRight className='text-right'>
-                                      <Button outlined lg type='submit' bsStyle='blue' onClick={::this.back}>Login</Button>
+                                      <Button outlined lg type='submit' bsStyle='blue' onClick={this.handleClick.bind(this)}>Connection</Button>
                                     </Col>
                                   </Row>
                                 </Grid>

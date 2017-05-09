@@ -29,7 +29,7 @@ class ApplicationSidebar extends React.Component {
                 <SidebarNav style={{marginBottom: 0}} ref={(c) => this._nav = c}>
                   <div className='sidebar-header'>Menu</div>
                   <SidebarNavItem glyph='icon-pixelvicon-photo-gallery' name='Gallery' href={::this.getPath('gallery')} />
-                  <SidebarNavItem glyph='icon-feather-share' name='Social' href={::this.getPath('social')} />
+                  <SidebarNavItem glyph='icon-feather-share' name='Profile' href={::this.getPath('profile')} />
                   <SidebarNavItem href={::this.getPath('maps')} glyph='icon-ikons-pin-2' name='Maps' />
                   <SidebarNavItem href={::this.getPath('tables/datatables')} glyph='icon-fontello-th-2' name='Datatables' />
                   <SidebarNavItem href={::this.getPath('calendar')} glyph='icon-fontello-calendar-alt' name='Calendar' />
@@ -39,21 +39,6 @@ class ApplicationSidebar extends React.Component {
           </Row>
         </Grid>
       </div>
-    );
-  }
-}
-
-class DummySidebar extends React.Component {
-  render() {
-    return (
-      <Grid>
-        <Row>
-          <Col xs={12}>
-            <div className='sidebar-header'>DUMMY SIDEBAR</div>
-            <LoremIpsum query='1p' />
-          </Col>
-        </Row>
-      </Grid>
     );
   }
 }
