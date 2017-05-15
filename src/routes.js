@@ -12,20 +12,15 @@ import Footer from './common/footer';
 
 /* Pages */
 import Gallery from './routes/Gallery';
-
 import Profile from './routes/Profile';
 import Maps from './routes/Maps';
-
 import Datatablesjs from './routes/Datatablesjs';
-
 import Calendar from './routes/Calendar';
-
 import Login from './routes/Login';
 import Signup from './routes/Signup';
 
-
-
 class App extends React.Component {
+
   render() {
     return (
       <MainContainer {...this.props}>

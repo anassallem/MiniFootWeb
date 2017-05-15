@@ -15,6 +15,18 @@ import {
 } from '@sketchpixy/rubix';
 
 export default class Calendar extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+        user: null,
+    };
+  }
+  componentWillMount() {
+    if(typeof(Storage) !== "undefined"){
+       var user = JSON.parse(localStorage.getItem('user'));
+        this.setState({ user: user });
+       }
+  }
   componentDidMount() {
     $('#calendar').fullCalendar({
       header: {

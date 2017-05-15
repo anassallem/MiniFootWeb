@@ -7,9 +7,8 @@ import {
   Label, Progress, Icon,
   SidebarDivider
 } from '@sketchpixy/rubix';
-
 import { Link, withRouter } from 'react-router';
-
+import { URL } from '../api/config';
 
 @withRouter
 class ApplicationSidebar extends React.Component {
@@ -29,7 +28,7 @@ class ApplicationSidebar extends React.Component {
                 <SidebarNav style={{marginBottom: 0}} ref={(c) => this._nav = c}>
                   <div className='sidebar-header'>Menu</div>
                   <SidebarNavItem glyph='icon-pixelvicon-photo-gallery' name='Gallery' href={::this.getPath('gallery')} />
-                  <SidebarNavItem glyph='icon-feather-share' name='Profile' href={::this.getPath('profile')} />
+                  <SidebarNavItem glyph='icon-feather-share' name='Profile' href={::this.getPath('profile')}/>
                   <SidebarNavItem href={::this.getPath('maps')} glyph='icon-ikons-pin-2' name='Maps' />
                   <SidebarNavItem href={::this.getPath('tables/datatables')} glyph='icon-fontello-th-2' name='Datatables' />
                   <SidebarNavItem href={::this.getPath('calendar')} glyph='icon-fontello-calendar-alt' name='Calendar' />
@@ -45,18 +44,35 @@ class ApplicationSidebar extends React.Component {
 
 @withRouter
 export default class SidebarContainer extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+        user: null,
+    };
+  }
+  componentWillMount() {
+    if(typeof(Storage) !== "undefined"){
+       var user = JSON.parse(localStorage.getItem('user'));
+        this.setState({ user: user });
+        if (user === null) {
+            this.props.router.push('/ltr/login');
+        }
+     }
+  }
+  renderProfile(){
 
-  render() {
-    return (
-      <div id='sidebar'>
+    if( this.state.user !== null) {
+      const img = `${URL}/users/upload/${this.state.user.photo}`;
+      return (
+        <div>
         <div id='avatar'>
           <Grid>
             <Row className='fg-white'>
               <Col xs={4} collapseRight>
-                <img src='/imgs/app/avatars/avatar0.png' width='40' height='40' />
+                <img src={ img } width='40' height='40' />
               </Col>
               <Col xs={8} collapseLeft id='avatar-col'>
-                <div style={{top: 23, fontSize: 16, lineHeight: 1, position: 'relative'}}>Anna Sanchez</div>
+                <div style={{top: 23, fontSize: 16, lineHeight: 1, position: 'relative'}}>{this.state.user.firstname} {this.state.user.lastname}</div>
                 <div>
                   <Progress id='demo-progress' value={30} color='#ffffff'/>
                 </div>
@@ -73,6 +89,14 @@ export default class SidebarContainer extends React.Component {
           </Sidebar>
         </div>
       </div>
-    );
+      );
+    }
   }
+  render() {
+    return (
+      <div id='sidebar'>
+        {this.renderProfile()}
+      </div>
+      );
+    }
 }

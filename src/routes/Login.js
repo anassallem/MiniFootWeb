@@ -88,9 +88,10 @@ export default class Login extends React.Component {
              this.setState({ error: "User Not Found"});
           } else {
             localStorage.setItem('user', JSON.stringify(res.user));
+            localStorage.setItem('stade', JSON.stringify(res.stade));
             this.setState(INITIALSTATE);
             setTimeout(() => {
-              this.props.router.push('/ltr/calendar');
+              this.props.router.push('/ltr/profile');
             }, 1000);
           }
         } else if (res.success === false) {

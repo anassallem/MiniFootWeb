@@ -1,5 +1,4 @@
 import React from 'react';
-
 import {
   Row,
   Col,
@@ -23,10 +22,17 @@ import {
   ButtonGroup,
   ControlLabel,
 } from '@sketchpixy/rubix';
-
+import { updateUser, uploadImageUser } from '../api/UserApi';
+import { URL } from '../api/config';
 
 export default class ProfileUser extends React.Component {
-
+  constructor(props) {
+    super(props);
+    this.state = {
+        refresh: ProfileUser.getCounter(),
+        changeButton: false
+    };
+  }
   static counter: 0;
   static getCounter = function() {
     return 'counter-' + ++ProfileUser.counter;
@@ -35,9 +41,6 @@ export default class ProfileUser extends React.Component {
     ProfileUser.counter = 0;
   };
 
-  state = {
-    refresh: ProfileUser.getCounter() // used to redraw the component
-  };
   componentDidMount() {
       this.renderEditable();
   }
@@ -52,86 +55,51 @@ export default class ProfileUser extends React.Component {
       mode: this.state.mode
     });
 
-    $('#fruits').editable({
-      mode: this.state.mode,
-      pk: 1,
-      limit: 3,
-      source: [
-        {value: 1, text: 'Lumière'},
-        {value: 2, text: 'Café'},
-        {value: 3, text: 'Vestiaire'},
-        {value: 4, text: 'Arbitre'},
-      ]
-     });
-
-    var countries = [];
-    $.each({"BD": "Bangladesh", "BE": "Belgium", "BF": "Burkina Faso", "BG": "Bulgaria", "BA": "Bosnia and Herzegovina", "BB": "Barbados", "WF": "Wallis and Futuna", "BL": "Saint Bartelemey", "BM": "Bermuda", "BN": "Brunei Darussalam", "BO": "Bolivia", "BH": "Bahrain", "BI": "Burundi", "BJ": "Benin", "BT": "Bhutan", "JM": "Jamaica", "BV": "Bouvet Island", "BW": "Botswana", "WS": "Samoa", "BR": "Brazil", "BS": "Bahamas", "JE": "Jersey", "BY": "Belarus", "O1": "Other Country", "LV": "Latvia", "RW": "Rwanda", "RS": "Serbia", "TL": "Timor-Leste", "RE": "Reunion", "LU": "Luxembourg", "TJ": "Tajikistan", "RO": "Romania", "PG": "Papua New Guinea", "GW": "Guinea-Bissau", "GU": "Guam", "GT": "Guatemala", "GS": "South Georgia and the South Sandwich Islands", "GR": "Greece", "GQ": "Equatorial Guinea", "GP": "Guadeloupe", "JP": "Japan", "GY": "Guyana", "GG": "Guernsey", "GF": "French Guiana", "GE": "Georgia", "GD": "Grenada", "GB": "United Kingdom", "GA": "Gabon", "SV": "El Salvador", "GN": "Guinea", "GM": "Gambia", "GL": "Greenland", "GI": "Gibraltar", "GH": "Ghana", "OM": "Oman", "TN": "Tunisia", "JO": "Jordan", "HR": "Croatia", "HT": "Haiti", "HU": "Hungary", "HK": "Hong Kong", "HN": "Honduras", "HM": "Heard Island and McDonald Islands", "VE": "Venezuela", "PR": "Puerto Rico", "PS": "Palestinian Territory", "PW": "Palau", "PT": "Portugal", "SJ": "Svalbard and Jan Mayen", "PY": "Paraguay", "IQ": "Iraq", "PA": "Panama", "PF": "French Polynesia", "BZ": "Belize", "PE": "Peru", "PK": "Pakistan", "PH": "Philippines", "PN": "Pitcairn", "TM": "Turkmenistan", "PL": "Poland", "PM": "Saint Pierre and Miquelon", "ZM": "Zambia", "EH": "Western Sahara", "RU": "Russian Federation", "EE": "Estonia", "EG": "Egypt", "TK": "Tokelau", "ZA": "South Africa", "EC": "Ecuador", "IT": "Italy", "VN": "Vietnam", "SB": "Solomon Islands", "EU": "Europe", "ET": "Ethiopia", "SO": "Somalia", "ZW": "Zimbabwe", "SA": "Saudi Arabia", "ES": "Spain", "ER": "Eritrea", "ME": "Montenegro", "MD": "Moldova, Republic of", "MG": "Madagascar", "MF": "Saint Martin", "MA": "Morocco", "MC": "Monaco", "UZ": "Uzbekistan", "MM": "Myanmar", "ML": "Mali", "MO": "Macao", "MN": "Mongolia", "MH": "Marshall Islands", "MK": "Macedonia", "MU": "Mauritius", "MT": "Malta", "MW": "Malawi", "MV": "Maldives", "MQ": "Martinique", "MP": "Northern Mariana Islands", "MS": "Montserrat", "MR": "Mauritania", "IM": "Isle of Man", "UG": "Uganda", "TZ": "Tanzania, United Republic of", "MY": "Malaysia", "MX": "Mexico", "IL": "Israel", "FR": "France", "IO": "British Indian Ocean Territory", "FX": "France, Metropolitan", "SH": "Saint Helena", "FI": "Finland", "FJ": "Fiji", "FK": "Falkland Islands (Malvinas)", "FM": "Micronesia, Federated States of", "FO": "Faroe Islands", "NI": "Nicaragua", "NL": "Netherlands", "NO": "Norway", "NA": "Namibia", "VU": "Vanuatu", "NC": "New Caledonia", "NE": "Niger", "NF": "Norfolk Island", "NG": "Nigeria", "NZ": "New Zealand", "NP": "Nepal", "NR": "Nauru", "NU": "Niue", "CK": "Cook Islands", "CI": "Cote d'Ivoire", "CH": "Switzerland", "CO": "Colombia", "CN": "China", "CM": "Cameroon", "CL": "Chile", "CC": "Cocos (Keeling) Islands", "CA": "Canada", "CG": "Congo", "CF": "Central African Republic", "CD": "Congo, The Democratic Republic of the", "CZ": "Czech Republic", "CY": "Cyprus", "CX": "Christmas Island", "CR": "Costa Rica", "CV": "Cape Verde", "CU": "Cuba", "SZ": "Swaziland", "SY": "Syrian Arab Republic", "KG": "Kyrgyzstan", "KE": "Kenya", "SR": "Suriname", "KI": "Kiribati", "KH": "Cambodia", "KN": "Saint Kitts and Nevis", "KM": "Comoros", "ST": "Sao Tome and Principe", "SK": "Slovakia", "KR": "Korea, Republic of", "SI": "Slovenia", "KP": "Korea, Democratic People's Republic of", "KW": "Kuwait", "SN": "Senegal", "SM": "San Marino", "SL": "Sierra Leone", "SC": "Seychelles", "KZ": "Kazakhstan", "KY": "Cayman Islands", "SG": "Singapore", "SE": "Sweden", "SD": "Sudan", "DO": "Dominican Republic", "DM": "Dominica", "DJ": "Djibouti", "DK": "Denmark", "VG": "Virgin Islands, British", "DE": "Germany", "YE": "Yemen", "DZ": "Algeria", "US": "United States", "UY": "Uruguay", "YT": "Mayotte", "UM": "United States Minor Outlying Islands", "LB": "Lebanon", "LC": "Saint Lucia", "LA": "Lao People's Democratic Republic", "TV": "Tuvalu", "TW": "Taiwan", "TT": "Trinidad and Tobago", "TR": "Turkey", "LK": "Sri Lanka", "LI": "Liechtenstein", "A1": "Anonymous Proxy", "TO": "Tonga", "LT": "Lithuania", "A2": "Satellite Provider", "LR": "Liberia", "LS": "Lesotho", "TH": "Thailand", "TF": "French Southern Territories", "TG": "Togo", "TD": "Chad", "TC": "Turks and Caicos Islands", "LY": "Libyan Arab Jamahiriya", "VA": "Holy See (Vatican City State)", "VC": "Saint Vincent and the Grenadines", "AE": "United Arab Emirates", "AD": "Andorra", "AG": "Antigua and Barbuda", "AF": "Afghanistan", "AI": "Anguilla", "VI": "Virgin Islands, U.S.", "IS": "Iceland", "IR": "Iran, Islamic Republic of", "AM": "Armenia", "AL": "Albania", "AO": "Angola", "AN": "Netherlands Antilles", "AQ": "Antarctica", "AP": "Asia/Pacific Region", "AS": "American Samoa", "AR": "Argentina", "AU": "Australia", "AT": "Austria", "AW": "Aruba", "IN": "India", "AX": "Aland Islands", "AZ": "Azerbaijan", "IE": "Ireland", "ID": "Indonesia", "UA": "Ukraine", "QA": "Qatar", "MZ": "Mozambique"}, function(k, v) {
-        countries.push({id: k, text: v});
-    });
-    var tarton = [];
-    $.each({"1":" 1ér Géneration ","2":" 2éme Géneration ", "3":" 3éme Géneration ", "4":" 4éme Géneration ", "5":" 5éme Géneration ", "6":" 6éme Géneration "}, function(i,t){
-      tarton.push({id: i, text: t});
-    });
-
-    $('#country').editable({
-      mode: this.state.mode,
-      source: countries,
-      select2: {
-        width: 200,
-        placeholder: 'Choisir votre pays',
-        allowClear: true
-      }
-    });
-    $('#countries').editable({
-      mode: this.state.mode,
-      source: countries,
-      select2: {
-        width: 200,
-        placeholder: 'Choisir votre pays',
-        allowClear: true
-      }
-    });
-    $('#stade').editable({
-      mode: this.state.mode,
-      source: tarton,
-      select2: {
-        width: 200,
-        placeholder: 'Choisir qualité de tarton',
-        allowClear: true
-      }
-    });
-
     var self = this;
     $('#user .editable').on('hidden', function(e, reason){
-      if(reason === 'save' || reason === 'nochange') {
+      if(reason === 'save') {
         var $next = $(this).closest('tr').next().find('.editable');
-        if(self.refs.autoopen.isChecked()) {
-          setTimeout(function() {
-            $next.editable('show');
-          }, 300);
-        } else {
-          $next.focus();
-        }
-      }
-    });
-    $('#stade .editable').on('hidden', function(e, reason){
-      if(reason === 'save' || reason === 'nochange') {
+        var value = e.target.text;
+        var idUser = self.props.user._id;
+        var user = { _id: idUser,[e.currentTarget.id]: value};
+          updateUser(idUser, user).then((res, err) => {
+            if (err) {
+              console.log(err);
+            } else {
+              self.props.changeUser(res);
+            }
+          });
+      } else if(reason === 'nochange') {
         var $next = $(this).closest('tr').next().find('.editable');
-        if(self.refs.autoopen.isChecked()) {
-          setTimeout(function() {
-            $next.editable('show');
-          }, 300);
-        } else {
-          $next.focus();
-        }
       }
     });
   }
-  toggleEditablePrfile() {
+  toggleEditableProfile() {
     $('#user .editable').editable('toggleDisabled');
   }
-  toggleEditable() {
-    $('#stade .editable').editable('toggleDisabled');
+   uploadImage(e) {
+      var idUser = this.props.user._id;
+       let file = e.target.files[0];
+       console.log(file);
+      //var photo = this.props.user.photo;
+      var data = new FormData();
+      data.append('file', file);
+      data.append('name', 'name');
+
+    uploadImageUser(idUser,data ).then((res, err) => {
+      if (err) {
+        console.log(err);
+      } else {
+          this.props.changeUser(res);
+      }
+    });
+  }
+   renderButton() {
+    if(this.state.changeButton == true){
+      return(
+        <Button style={{margin: 10}} onClick={this.uploadImage.bind(this)}>Changer</Button>
+      );
+    }
   }
 
   render() {
@@ -156,7 +124,7 @@ export default class ProfileUser extends React.Component {
                         <Grid>
                           <Row>
                             <Col xs={12} className='text-right' collapseRight>
-                              <Button outlined bsStyle='green' onClick={::this.toggleEditablePrfile}>Activé/Désactivé</Button>
+                              <Button outlined bsStyle='green' onClick={::this.toggleEditableProfile}>Activé/Désactivé</Button>
                             </Col>
                           </Row>
                         </Grid>
@@ -167,39 +135,34 @@ export default class ProfileUser extends React.Component {
                         <tr>
                           <td style={{width: 150}}>Nom</td>
                           <td>
-                            <a href='#' key={this.state.refresh} className='xeditable' data-type='text' data-title='Modifier votre nom'>Nom</a>
+                            <a href='#' key={this.state.refresh} id="firstname" className='xeditable' data-type='text' data-title='Modifier votre nom'>{this.props.user.firstname}</a>
                           </td>
                         </tr>
                         <tr>
                           <td>Prénom</td>
                           <td>
-                            <a href='#' key={this.state.refresh} className='xeditable' data-type='text' data-title='Modifier votre prénom'> Prénom</a>
+                            <a href='#' key={this.state.refresh} id="lastname" className='xeditable' data-type='text' data-title='Modifier votre prénom'>{this.props.user.lastname}</a>
                           </td>
                         </tr>
                         <tr>
                           <td>E-mail</td>
                           <td>
-                            <a href='#' key={this.state.refresh} className='xeditable' data-type='text' data-title='Modifier votre e-mail'> E-mail</a>
+                            <a href='#' key={this.state.refresh} id="email" className='xeditable' data-type='text' data-title='Modifier votre e-mail'>{this.props.user.email}</a>
                           </td>
                         </tr>
                         <tr>
                           <td>Adresse</td>
                           <td>
-                              <a href='#' key={this.state.refresh} id='country' data-type='select2' data-pk='1' data-value='TN' data-title='Choisir votre pays'></a>
+                          <a href='#' key={this.state.refresh} id="adresse" className='xeditable' data-type='text' data-title='Modifier votre adresse'>{this.props.user.adresse}</a>
                           </td>
                         </tr>
                         <tr>
-                          <td>Mot de passe</td>
-                            <td>
-                              <a href='#' key={this.state.refresh} className='xeditable' data-type='text' data-title='Modifier votre mot de passe'> Mot de passe</a>
-                            </td>
-                        </tr>
-                        <tr>
-                          <td> Photo</td>
+                          <td>Photo</td>
                           <td>
-                            <FormGroup controlId='fileinputhorizontal'>
-                                <FormControl type='file' />
-                            </FormGroup>
+                            <form >
+                              <input name="file" type="file" onChange={() => {this.setState({ changeButton: true });}}/>
+                              {this.renderButton()}
+                          </form>
                           </td>
                         </tr>
                       </tbody>
