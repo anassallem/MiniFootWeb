@@ -51,7 +51,7 @@ export default (
             <Route path='gallery' component={Gallery} />
             <Route path='profile' component={Profile} />
             <Route path='maps' component={Maps} />
-            <Route path='tables/datatables' component={Datatablesjs} />
+            <Route path='datatables' component={Datatablesjs} />
             <Route path='calendar' component={Calendar} />
         </Route>
     </Route>

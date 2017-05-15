@@ -1,4 +1,5 @@
 import React from 'react';
+import axios from 'axios';
 
 import {
   Row,
@@ -7,6 +8,8 @@ import {
   Grid,
   Panel,
   Image,
+  Form,
+  FormControl,
   Table,
   Button,
   PanelBody,
@@ -14,27 +17,24 @@ import {
   PanelContainer,
 } from '@sketchpixy/rubix';
 
+import { URL } from '../api/config';
+import { getImagesStade } from '../api/StadeApi';
 class GalleryItem extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      active: this.props.active || false,
-      counts: 0
+      active: this.props.active || false
     };
   }
   handleIncrement(e) {
     if(this.state.active) return;
-    this.setState({
-      active: true,
-      counts: this.state.counts+1
-    });
+    this.setState({ active: true });
   }
   componentDidMount() {
-    this.setState({
-      counts: (Math.round(Math.random() * 20) + 4)
-    });
+
   }
   render() {
+      const img =`${URL}/stade/stadeUploads/${this.props.image}`;
     return (
       <PanelContainer>
         <Panel>
@@ -42,8 +42,8 @@ class GalleryItem extends React.Component {
             <Grid className='gallery-item'>
               <Row>
                 <Col xs={12} style={{padding: 12.5}}>
-                  <a className='gallery-1 gallery-item-link' href={`/imgs/app/gallery/${this.props.image}.jpg`} title={this.props.title}>
-                    <Image responsive src={`/imgs/app/gallery/${this.props.image}-thumb.jpg`} alt={this.props.title} width='200' height='150'/>
+                  <a className='gallery-1 gallery-item-link' href={img} title={this.props.title}>
+                    <Image responsive src={img} alt={this.props.title} width='200' height='150'/>
                     <div className='black-wrapper text-center'>
                       <Table style={{height: '100%', width: '100%'}}>
                         <tbody>
@@ -56,16 +56,6 @@ class GalleryItem extends React.Component {
                       </Table>
                     </div>
                   </a>
-                  <div className='text-center'>
-                    <h4 className='fg-darkgrayishblue75 hidden-xs' style={{textTransform: 'uppercase'}}>{this.props.title}</h4>
-                    <h6 className='fg-darkgrayishblue75 visible-xs' style={{textTransform: 'uppercase'}}>{this.props.title}</h6>
-                    <h5 className='fg-darkgray50 hidden-xs' style={{textTransform: 'uppercase'}}>{this.props.subtitle}</h5>
-                    <h6 className='visible-xs' style={{textTransform: 'uppercase'}}><small className='fg-darkgray50'>{this.props.subtitle}</small></h6>
-                      <Button outlined onlyOnHover bsStyle='red' className='fav-btn' active={this.state.active} onClick={::this.handleIncrement}>
-                        <Icon glyph='icon-flatline-heart' />
-                        <span className='counts'>{this.state.counts}</span>
-                      </Button>
-                  </div>
                 </Col>
               </Row>
             </Grid>
@@ -77,47 +67,116 @@ class GalleryItem extends React.Component {
 }
 
 export default class Gallery extends React.Component {
-  componentDidMount() {
-    var links = document.getElementsByClassName('gallery-1');
-    $('.gallery-1').unbind('click').bind('click', function(event) {
-      blueimp.Gallery(links, {
-        index: $(this).get(0),
-        event: event
-      });
-    });
-  }
-
-  render() {
-    return (
-      <Row className='gallery-view'>
-        <Col xs={6} sm={4} collapseRight>
-          <GalleryItem image='tumblr_n6es0tRk5w1st5lhmo1_1280' title='skyline' subtitle='10th Dec - 12th Dec' />
-        </Col>
-        <Col xs={6} sm={4} collapseRight>
-          <GalleryItem active image='tumblr_n6eszmeQMR1st5lhmo1_1280' title='me at ny' subtitle='11th Dec - 12th Dec' />
-        </Col>
-        <Col xs={6} sm={4} collapseRight>
-          <GalleryItem image='tumblr_n6rzkfxeOR1st5lhmo1_1280' title='vintage cameras' subtitle='13th Dec - 14th Dec' />
-        </Col>
-        <Col xs={6} sm={4} collapseRight>
-          <GalleryItem image='tumblr_n6rztipoQy1st5lhmo1_1280' title='columns' subtitle='13th Dec - 14th Dec' />
-        </Col>
-        <Col xs={6} sm={4} collapseRight>
-          <GalleryItem image='tumblr_n7fg2vYZ741st5lhmo1_1280' title='peak' subtitle='14th Dec - 15th Dec' />
-        </Col>
-        <Col xs={6} sm={4} collapseRight>
-          <GalleryItem image='tumblr_n7fgnop0bz1st5lhmo1_1280' title='Mac' subtitle='14th Dec - 15th Dec' />
-        </Col>
-        <Col xs={6} sm={4} collapseRight>
-          <GalleryItem image='tumblr_n7yhe1sTa41st5lhmo1_1280' title='Taxi cabs' subtitle='14th Dec - 15th Dec' />
-        </Col>
-        <Col xs={6} sm={4} collapseRight>
-          <GalleryItem image='tumblr_n8gxs0oWZ21st5lhmo1_1280' title='Golden gate' subtitle='14th Dec - 15th Dec' />
-        </Col>
-        <Col xs={6} sm={4} collapseRight>
-          <GalleryItem image='tumblr_n9hyqfJavs1st5lhmo1_1280' title='Empire state' subtitle='14th Dec - 15th Dec' />
-        </Col>
-      </Row>
+    constructor(props) {
+        super(props);
+        this.state = { images: [], visible: false, photos: [] };
+    }
+    componentDidMount() {
+        const stade = JSON.parse(localStorage.getItem('stade'));
+        getImagesStade(stade._id).then((res) => {
+            this.setState({ photos: res });
+          }, (err) => {
+            console.log(err);
+          });
+        var links = document.getElementsByClassName('gallery-1');
+        $('.gallery-1').unbind('click').bind('click', function(event) {
+          blueimp.Gallery(links, {
+            index: $(this).get(0),
+            event: event
+          });
+        });
+        $('#my-awesome-dropzone').dropzone({
+          paramName: "file", // The name that will be used to transfer the file
+          maxFilesize: 2, // MB
+          accept: (file, done) => {
+            this.setState({ visible: true, images: [...this.state.images, ...file]});
+            done();
+          }
+        });
+    }
+    handleUploadImages() {
+        const stade = JSON.parse(localStorage.getItem('stade'));
+        let self = this;
+        this.state.images.forEach((item) => {
+            const imageName = `image${Date.now()}`;
+            let form = new FormData();
+            form.append('name', imageName);
+            form.append('photo', item);
+             axios.post(`${URL}/stade/stadeUploads/${stade._id}/photos`,form,
+                {headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' }})
+                            .then(function (response) {
+                                console.log(response);
+                                self.setState({ visible: false,
+                                images: self.state.images.filter((img)=> img.name === item.name),
+                                photos: [...response.data.name, ...self.state.photos]
+                            });
+                            }) .catch(function (error) {
+                                console.log(error);
+                            });
+        });
+        $('#my-awesome-dropzone').empty();
+    }
+    renderButtonUpload() {
+        if (this.state.visible) {
+            return <Button outlined bsStyle='success' onClick={this.handleUploadImages.bind(this)}>Upload</Button>;
+        }
+    }
+    renderPhotosStade() {
+        console.log(this.state.photos);
+        if (this.state.photos.length > 0) {
+            return this.state.photos.map((item) => {
+                return (
+                    <Col xs={6} sm={4} collapseRight key={item}>
+                        <GalleryItem image={item} title='Image' />
+                    </Col>
+                );
+            });
+        }
+    }
+    render() {
+        return (
+          <div>
+              <Row>
+                <Col sm={12}>
+                  <PanelContainer>
+                    <Panel>
+                      <PanelHeader className='bg-darkgreen45 fg-white' style={{margin: 0}}>
+                        <Grid>
+                          <Row>
+                            <Col xs={12}>
+                              <h3>Upload images</h3>
+                            </Col>
+                          </Row>
+                        </Grid>
+                      </PanelHeader>
+                      <PanelBody>
+                        <Grid>
+                          <Row style={{marginTop: 10}}>
+                            <Col xs={12}>
+                                <Row>
+                                    <Col xs={10}>
+                                        <h4>Clicker ou gliser vos images pour les télécharger dans le serveur</h4>
+                                    </Col>
+                                    <Col xs={2}>
+                                        {this.renderButtonUpload()}
+                                    </Col>
+                                </Row>
+                              <Form action='/dropzone/file-upload'
+                                    className='dropzone'
+                                    id='my-awesome-dropzone'>
+                              </Form>
+                            </Col>
+                          </Row>
+                        </Grid>
+                      </PanelBody>
+                    </Panel>
+                  </PanelContainer>
+                </Col>
+              </Row>
+              <Row className='gallery-view'>
+                {this.renderPhotosStade()}
+              </Row>
+          </div>
     );
-  }
+    }
 }
