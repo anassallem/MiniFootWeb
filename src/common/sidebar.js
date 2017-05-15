@@ -31,7 +31,7 @@ class ApplicationSidebar extends React.Component {
                   <SidebarNavItem glyph='icon-pixelvicon-photo-gallery' name='Gallery' href={::this.getPath('gallery')} />
                   <SidebarNavItem glyph='icon-feather-share' name='Profile' href={::this.getPath('profile')} />
                   <SidebarNavItem href={::this.getPath('maps')} glyph='icon-ikons-pin-2' name='Maps' />
-                  <SidebarNavItem href={::this.getPath('tables/datatables')} glyph='icon-fontello-th-2' name='Datatables' />
+                  <SidebarNavItem href={::this.getPath('datatables')} glyph='icon-fontello-th-2' name='Datatables' />
                   <SidebarNavItem href={::this.getPath('calendar')} glyph='icon-fontello-calendar-alt' name='Calendar' />
                 </SidebarNav>
               </div>
