@@ -104,16 +104,13 @@ export default class ProfileUser extends React.Component {
 
   render() {
     return (
-        <Col xs={5}>
-          <Row>
-            <Col xs={12}>
-              <PanelContainer noOverflow>
+        <PanelContainer noOverflow>
                 <Panel>
                   <PanelHeader className='bg-darkblue fg-white' style={{margin: 0}}>
                     <Grid>
                       <Row>
                         <Col xs={12}>
-                          <h3>Profile</h3>
+                          <h3>Profile Manager</h3>
                         </Col>
                       </Row>
                     </Grid>
@@ -170,9 +167,7 @@ export default class ProfileUser extends React.Component {
                   </PanelBody>
                 </Panel>
               </PanelContainer>
-            </Col>
-          </Row>
-        </Col>
+
     );
   }
 }

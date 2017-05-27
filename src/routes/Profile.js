@@ -1,8 +1,24 @@
 import React from 'react';
-import { Row, Image } from '@sketchpixy/rubix';
+import {
+    Row,
+    Image ,
+    Col,
+    Grid,
+    Form,
+    Panel,
+    Button,
+    FormGroup,
+    PanelBody,
+    InputGroup,
+    FormControl,
+    PanelHeader,
+    PanelContainer
+  } from '@sketchpixy/rubix';
 import ProfileUser from './ProfileUser';
 import ProfileStade from './ProfileStade';
+import Maps from './Maps';
 import { URL } from '../api/config';
+
 class SocialBanner extends React.Component {
   constructor(props) {
     super(props);
@@ -32,7 +48,23 @@ class SocialBanner extends React.Component {
     );
   }
 }
-
+class MapContainer extends React.Component {
+  render() {
+    return (
+      <div>
+        <PanelContainer>
+          <Panel>
+            <PanelBody style={{padding: 25}}>
+              <h4 className='text-center' style={{marginTop: 0}}>{this.props.name}</h4>
+              {this.props.children}
+              <div id={this.props.id} style={{height: 300}}></div>
+            </PanelBody>
+          </Panel>
+        </PanelContainer>
+      </div>
+    );
+  }
+}
 export default class Profile extends React.Component {
   constructor(props) {
     super(props);
@@ -41,6 +73,7 @@ export default class Profile extends React.Component {
         stade:  null
     };
   }
+
   componentWillMount() {
     if(typeof(Storage) !== "undefined"){
        var user = JSON.parse(localStorage.getItem('user'));
@@ -65,18 +98,47 @@ export default class Profile extends React.Component {
       return (
         <div>
           <SocialBanner  user={this.state.user} stade={this.state.stade}/>
-          <ProfileUser user={this.state.user} changeUser={this.handleChangeUser.bind(this)} />
-          <ProfileStade  stade={this.state.stade} changeStade={this.handleChangeStade.bind(this)}/>
+          <Col xs={12}>
+            <Row>
+              <Col xs={12}>
+                <ProfileUser user={this.state.user} changeUser={this.handleChangeUser.bind(this)} />
+              </Col>
+            </Row>
+          </Col>
+          <Col xs={12}>
+            <Row>
+              <Col xs={12}>
+                <ProfileStade  stade={this.state.stade} changeStade={this.handleChangeStade.bind(this)}/>
+            </Col>
+          </Row>
+        </Col>
         </div>
-
+      );
+    }
+  }
+  renderMaps(){
+    if( this.state.user !== null && this.state.stade !== null ) {
+        return (
+          <div>
+            <Row>
+              <Col sm={12}>
+                <MapContainer id='geocode' name='Carte Géographique'>
+                  <Maps user={this.state.user} stade={this.state.stade}/>
+                </MapContainer>
+            </Col>
+          </Row>
+        </div>
       );
     }
   }
   render() {
     return (
+      <div>
       <Row className='social'>
       {this.renderProfile()}
       </Row>
+      {this.renderMaps()}
+      </div>
     );
   }
 }

@@ -1,3 +1,3 @@
-export const URL = 'http://192.168.1.61:3000/api';
+export const URL = 'http://192.168.1.66:3000/api';
 export const CONFIG = { headers: { 'Content-Type': 'application/json' } };
 export const CONFIGIMAGE = { headers: { 'Content-Type': 'multipart/form-data' } };

@@ -24,7 +24,9 @@ import {
   ControlLabel,
 } from '@sketchpixy/rubix';
 import { updateStade } from '../api/StadeApi';
+import { Link, withRouter } from 'react-router';
 
+@withRouter
 export default class ProfileStade extends React.Component {
   constructor(props) {
     super(props);
@@ -61,6 +63,11 @@ export default class ProfileStade extends React.Component {
   componentWillUnmount() {
       ProfileStade.resetCounter();
     $('#body, html').removeClass('social');
+  }
+  getPath(path) {
+    var dir = this.props.location.pathname.search('rtl') !== -1 ? 'rtl' : 'ltr';
+    path = `/${dir}/${path}`;
+    return path;
   }
 
   renderEditable() {
@@ -162,16 +169,13 @@ export default class ProfileStade extends React.Component {
 
   render() {
     return (
-        <Col xs={7}>
-          <Row>
-            <Col xs={12}>
-              <PanelContainer noOverflow>
+        <PanelContainer noOverflow>
                 <Panel>
                   <PanelHeader className='bg-darkblue fg-white' style={{margin: 0}}>
                     <Grid>
                       <Row>
                         <Col xs={12}>
-                          <h3>Profile</h3>
+                          <h3>Profile Stade</h3>
                         </Col>
                       </Row>
                     </Grid>
@@ -209,9 +213,21 @@ export default class ProfileStade extends React.Component {
                           </td>
                         </tr>
                         <tr>
+                          <td style={{width: 300}}>Téléphone</td>
+                          <td>
+                            <a href='#' key={this.state.refresh} id="phone" className='xeditable' data-type='text' data-title='Enter username'>{this.props.stade.phone}</a>
+                          </td>
+                        </tr>
+                        <tr>
                           <td>Date de création</td>
                           <td>
                             <a href='#' key={this.state.refresh} id="createdAt" className='xeditable' data-type='text' data-title='Ajouter date de création'>{moment(this.props.stade.createdAt).format('DD/MM/YYYY')}</a>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style={{width: 300}}>Tarif</td>
+                          <td>
+                            <a href='#' key={this.state.refresh} id="tarif" className='xeditable' data-type='text' data-title='Enter username'>{this.props.stade.Tarif}</a>
                           </td>
                         </tr>
                         <tr>
@@ -231,9 +247,6 @@ export default class ProfileStade extends React.Component {
                   </PanelBody>
                 </Panel>
               </PanelContainer>
-            </Col>
-          </Row>
-        </Col>
     );
   }
 }

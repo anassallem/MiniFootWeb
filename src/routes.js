@@ -13,7 +13,7 @@ import Footer from './common/footer';
 /* Pages */
 import Gallery from './routes/Gallery';
 import Profile from './routes/Profile';
-import Maps from './routes/Maps';
+import Reservation from './routes/Reservation';
 import Datatablesjs from './routes/Datatablesjs';
 import Calendar from './routes/Calendar';
 import Login from './routes/Login';
@@ -50,7 +50,7 @@ export default (
         <Route component={App} path='/ltr'>
             <Route path='gallery' component={Gallery} />
             <Route path='profile' component={Profile} />
-            <Route path='maps' component={Maps} />
+            <Route path='reservation' component={Reservation} />
             <Route path='datatables' component={Datatablesjs} />
             <Route path='calendar' component={Calendar} />
         </Route>

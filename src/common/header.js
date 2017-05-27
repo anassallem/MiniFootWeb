@@ -1,11 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import classNames from 'classnames';
-
+import Notification from './notification';
 import { Link, withRouter } from 'react-router';
-
 import l20n, { Entity } from '@sketchpixy/rubix/lib/L20n';
-
+import io from 'socket.io-client/dist/socket.io';
 import {
   Label,
   SidebarBtn,
@@ -23,7 +22,7 @@ import {
   Row,
   Radio,
   Col } from '@sketchpixy/rubix';
-
+import { URL } from '../api/config';
 class Brand extends React.Component {
   render() {
     return (
@@ -38,116 +37,30 @@ class Brand extends React.Component {
   }
 }
 
-
-class NotificationsMenu extends React.Component {
-  render() {
-    const bullhornIcon = (
-      <span>
-        <Icon bundle='fontello' glyph='bullhorn' />
-        <Badge className='fg-darkbrown bg-orange notification-badge'>3</Badge>
-      </span>
-    );
-
-    return (
-      <NavDropdownHover noCaret eventKey={6} title={bullhornIcon} id='notifications-menu' className='header-menu collapse-left'>
-        <MenuItem header>
-          <Entity entity='notificationsMenuHeading' />
-        </MenuItem>
-        <MenuItem href='#'>
-          <Grid>
-            <Row>
-              <Col xs={2} className='avatar-container' collapseRight>
-                <div><img src='/imgs/app/avatars/avatar22.png' width='40' height='40' alt='sarah_patchett' /></div>
-                <div className='text-center'>
-                  <Label bsStyle='info'>NEW</Label>
-                </div>
-              </Col>
-              <Col xs={10} className='notification-container' collapseLeft collapseRight>
-                <div className='time'>
-                  <strong className='fg-darkgray50'><Icon bundle='fontello' glyph='chat-5'/><em><Entity entity='notificationsTimeFirst' /></em></strong>
-                </div>
-                <div className='message-header'>
-                  <strong className='fg-darkgreen45'>Sarah Patchett sent you a private message</strong>
-                </div>
-                <div className='message-details fg-text'>
-                  <span>{"Hey Anna! Sorry for delayed response. I've just finished reading the mail you sent couple of days ago..."}</span>
-                </div>
-              </Col>
-            </Row>
-          </Grid>
-        </MenuItem>
-        <MenuItem href='#'>
-          <Grid>
-            <Row>
-              <Col xs={2} className='avatar-container' collapseRight>
-                <img src='/imgs/app/avatars/avatar21.png' width='40' height='40' alt='john_young' />
-              </Col>
-              <Col xs={10} className='notification-container' collapseLeft collapseRight>
-                <div className='time'>
-                  <strong className='fg-darkgray50'><Icon bundle='fontello' glyph='user-add'/><em>2 hours ago</em></strong>
-                </div>
-                <div className='message-header'>
-                  <strong className='fg-darkgreen45'>John Young added you as a collaborator</strong>
-                </div>
-                <div className='message-details fg-text'>
-                  <span>to the repository </span><em className='fg-darkblue'>sketchpixy/rubix</em>
-                </div>
-              </Col>
-            </Row>
-          </Grid>
-        </MenuItem>
-        <MenuItem href='#'>
-          <Grid>
-            <Row>
-              <Col xs={2} className='avatar-container' collapseRight>
-                <div><img src='/imgs/app/github.png' width='40' height='40' alt='github' /></div>
-                <div className='text-center'>
-                  <Label bsStyle='danger'>ALERT</Label>
-                </div>
-              </Col>
-              <Col xs={10} className='notification-container' collapseLeft collapseRight>
-                <div className='time'>
-                  <strong className='fg-darkgray50'><Icon bundle='fontello' glyph='attention-alt-1'/><em>5 days ago</em></strong>
-                </div>
-                <div className='message-header'>
-                  <strong className='fg-darkgreen45'>Github sent you a notification</strong>
-                </div>
-                <div className='message-details fg-text'>
-                  <span>Your </span><span className='fg-darkblue'>Large Plan</span><span> will expire in one week. Please update your billing details at our Billing center. Thank you!</span>
-                </div>
-              </Col>
-            </Row>
-          </Grid>
-        </MenuItem>
-        <MenuItem noHover>
-          <Grid style={{marginBottom: -10}}>
-            <Row>
-              <Col xs={6} collapseLeft collapseRight>
-                <Button block className='notification-footer-btn left-btn'>MARK ALL READ</Button>
-              </Col>
-              <Col xs={6} collapseLeft collapseRight>
-                <Button block className='notification-footer-btn right-btn'>VIEW ALL</Button>
-              </Col>
-            </Row>
-          </Grid>
-        </MenuItem>
-      </NavDropdownHover>
-    );
-  }
-}
-
-
 @withRouter
 class HeaderNavigation extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      notifications: []
+    };
+  }
+  componentWillMount() {
+    if(typeof(Storage) !== "undefined"){
+     var stade = JSON.parse(localStorage.getItem('stade'));
+     this.socket = io(URL, { jsonp: false });
+     this.socket.emit('connection');
+     this.socket.on(stade._id, (notify) => {
+       this.setState({ notifications: [... notify, ...this.state.notifications] });
+    });
+  }
+}
   componentDidMount() {
     $('html').addClass('blue');
   }
-
-
   handleLogout(e) {
     this.props.router.push('/');
   }
-
   getPath(path) {
     var dir = this.props.location.pathname.search('rtl') !== -1 ? 'rtl' : 'ltr';
     path = `/${dir}/${path}`;
@@ -158,8 +71,7 @@ class HeaderNavigation extends React.Component {
     return (
       <Nav pullRight>
         <Nav className='hidden-xs'>
-          <NavItem divider />
-          <NotificationsMenu />
+          <Notification notifications={this.state.notifications} />
         </Nav>
         <Nav>
           <NavItem className='logout' href='#' onClick={::this.handleLogout}>
@@ -172,6 +84,7 @@ class HeaderNavigation extends React.Component {
 }
 
 export default class Header extends React.Component {
+
   render() {
     return (
       <Grid id='navbar' {...this.props}>
