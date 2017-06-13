@@ -99,7 +99,7 @@ export default class Calendar extends React.Component {
                         } else {
                           $('#calendar').fullCalendar('removeEvents', function (event) {
                               return event == calEvent;
-                            });      
+                            });
                         }
                       });
                       vex.close($vexContent.data().vex.id);
@@ -306,7 +306,7 @@ export default class Calendar extends React.Component {
               <Grid>
                 <Row>
                   <Col xs={12}>
-                    <h3>Créer un évenement</h3>
+                    <h3>Créer un match</h3>
                     <hr></hr>
                     <div>
                       <label >Choisir les deux équipes</label>

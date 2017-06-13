@@ -13,6 +13,7 @@ import Footer from './common/footer';
 /* Pages */
 import Gallery from './routes/Gallery';
 import Profile from './routes/Profile';
+import Evenement from './routes/Evenement';
 import Reservation from './routes/Reservation';
 import Datatablesjs from './routes/Datatablesjs';
 import Calendar from './routes/Calendar';
@@ -53,6 +54,7 @@ export default (
             <Route path='reservation' component={Reservation} />
             <Route path='datatables' component={Datatablesjs} />
             <Route path='calendar' component={Calendar} />
+            <Route path='evenement' component={Evenement} />
         </Route>
     </Route>
 );
