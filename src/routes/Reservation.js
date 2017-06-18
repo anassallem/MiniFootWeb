@@ -54,9 +54,11 @@ export default class Reservation extends React.Component {
     let clone = this.state.notifications ;
     clone.forEach((item) => {
       if(match._id === item._id) {
-        const start = moment(`${item.date} ${time.target.value}`);
+        const t = moment(item.date).format("YYYY-MM-DD");
+        const start = moment(`${t} ${time.target.value}`);
         var end =  moment(start).add(1.5, 'hours')
         item.event = { start: start._d, end: end._d };
+        console.log(start);
       }
     });
     this.setState({ notifications: clone, time : time.target.value });
@@ -73,13 +75,13 @@ export default class Reservation extends React.Component {
   }
   onClickConfirm(match, e) {
     if(this.state.time !== '--:--'){
-      acceptReservation(match._id, match).then((res, err) => {
+     acceptReservation(match._id, match).then((res, err) => {
         if (err) {
           console.log(err);
         } else {
           this.setState({ notifications: this.state.notifications.filter((item) => {return (match._id !== item._id);}) });
         }
-      });
+    });
     }else{
       vex.dialog.alert("Vous devez choisir l'heure du match avant la confirmation");
     }

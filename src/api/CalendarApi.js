@@ -20,8 +20,9 @@ export const createEvent = (event) => {
     });
 };
 
-export const getAllEvents = (idStade, date) => {
-    const requestURL = `${URL}/match/${idStade}?date=${date}`;
+
+export const getAllEvents = (idStade) => {
+    const requestURL = `${URL}/match/${idStade}/manager`;
     return axios.get(requestURL)
     .then((res) => {
       return res.data;

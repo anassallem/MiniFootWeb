@@ -26,6 +26,8 @@ export default class Datatablesjs extends Component {
           .addClass('nowrap')
           .dataTable({
             responsive: true,
+            "paging": false,
+            "bFilter": false,
             columnDefs: [
               { targets: [-1, -3], className: 'dt-body-right' }
             ]
@@ -73,16 +75,6 @@ export default class Datatablesjs extends Component {
                                   <th>Taille</th>
                                 </tr>
                               </thead>
-                              <tfoot>
-                                <tr>
-                                  <th>Nom</th>
-                                  <th>Prénom</th>
-                                  <th>Adresse</th>
-                                  <th>Position</th>
-                                  <th>Age</th>
-                                  <th>Taille</th>
-                                </tr>
-                              </tfoot>
                               <tbody>
                                 {this.renderUsers()}
                               </tbody>

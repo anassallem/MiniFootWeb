@@ -61,13 +61,14 @@ export default class Calendar extends React.Component {
   componentDidMount() {
     var idStade = this.state.stade._id;
     var self = this;
-    getAllEvents(idStade, 'today').then((res,err) => {
+    getAllEvents(idStade).then((res,err) => {
       if (err) {
           console.log(err);
       } else {
           res.forEach((item) => {
             if(item.event !== undefined) {
               item.event._id = item._id;
+              item.event.title = `${item.teamOne.name} vs ${item.teamTow.name}`;
               this.setState({ listEvents: [ ...this.state.listEvents, ...item.event ]});
             }
           });
@@ -191,6 +192,7 @@ export default class Calendar extends React.Component {
          if (err) {
              console.log(err);
          } else {
+             res.event.title = `${teamOne.name} vs ${teamTwo.name}`;
              this.setState({ listEvents: [ ...this.state.listEvents, ...res.event ] ,start: '', end: '', teamOne: null, teamTwo: null });
                $('#calendar').fullCalendar('renderEvent', res.event, true);
          }
